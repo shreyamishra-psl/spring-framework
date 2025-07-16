@@ -88,7 +88,7 @@ public class HiddenHttpMethodFilter implements WebFilter {
 	}
 
 	private ServerWebExchange mapExchange(ServerWebExchange exchange, String methodParamValue) {
-		HttpMethod httpMethod = HttpMethod.valueOf(methodParamValue.toUpperCase(Locale.ENGLISH));
+		HttpMethod httpMethod = HttpMethod.valueOf(methodParamValue.toUpperCase(Locale.ROOT));
 		if (ALLOWED_METHODS.contains(httpMethod)) {
 			return exchange.mutate().request(builder -> builder.method(httpMethod)).build();
 		}

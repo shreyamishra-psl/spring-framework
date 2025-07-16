@@ -16,6 +16,7 @@
 
 package org.springframework.http.server.reactive.observation;
 
+import java.util.Locale;
 import java.util.Set;
 
 import io.micrometer.common.KeyValue;
@@ -87,7 +88,7 @@ public class DefaultServerRequestObservationConvention implements ServerRequestO
 
 	@Override
 	public String getContextualName(ServerRequestObservationContext context) {
-		String httpMethod = context.getCarrier().getMethod().name().toLowerCase();
+		String httpMethod = context.getCarrier().getMethod().name().toLowerCase(Locale.ROOT);
 		if (context.getPathPattern() != null) {
 			return "http " + httpMethod + " " + context.getPathPattern();
 		}
