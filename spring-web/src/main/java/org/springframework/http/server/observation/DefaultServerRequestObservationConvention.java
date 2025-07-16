@@ -16,6 +16,7 @@
 
 package org.springframework.http.server.observation;
 
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,7 +90,7 @@ public class DefaultServerRequestObservationConvention implements ServerRequestO
 
 	@Override
 	public String getContextualName(ServerRequestObservationContext context) {
-		String httpMethod = context.getCarrier().getMethod().toLowerCase();
+		String httpMethod = context.getCarrier().getMethod().toLowerCase(Locale.ROOT);
 		if (context.getPathPattern() != null) {
 			return "http " + httpMethod + " " + context.getPathPattern();
 		}

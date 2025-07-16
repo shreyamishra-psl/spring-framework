@@ -21,11 +21,14 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.testfixture.beans.ITestBean;
 import org.springframework.beans.testfixture.beans.TestBean;
 import org.springframework.core.io.ClassPathResource;
@@ -36,6 +39,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.MultipartHttpMessageWriter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.BindException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.testfixture.http.client.reactive.MockClientHttpRequest;
 import org.springframework.web.testfixture.http.server.reactive.MockServerHttpRequest;
@@ -219,7 +223,20 @@ public class WebExchangeDataBinderTests {
 		assertThat(bean.getSomePartList().get(1).filename()).isEqualTo("spring.png");
 	}
 
-
+	@Test
+	void bindingWithDisallowedFieldsWithTurkishLocale() throws BindException {
+		TestBean user = new TestBean();
+		WebExchangeDataBinder binder = new WebExchangeDataBinder(user);
+		Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+		binder.setDisallowedFields("ISJEDI");
+		Map<String, String> formData = Map.of("isJedi", "true");
+		MutablePropertyValues pvs = new MutablePropertyValues(formData);
+		binder.bind(pvs);
+		binder.close();
+		assertThat(user.isJedi()).as("should not bind disallowed 'isJedi' field").isFalse();
+		assertThat(binder.getBindingResult().getSuppressedFields())
+				.containsExactlyInAnyOrder("isJedi");
+	}
 
 	private ServerWebExchange exchange(MultiValueMap<String, String> formData) {
 

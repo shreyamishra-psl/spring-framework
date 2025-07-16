@@ -705,6 +705,24 @@ class DataBinderTests {
 	}
 
 	@Test
+	void bindingWithDisallowedFieldsWithTurkishLocale() throws BindException {
+		TestBean user = new TestBean();
+		DataBinder binder = new DataBinder(user);
+		// Simulate Turkish locale (where "ISJEDI".toLowerCase() != "isjedi")
+		Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+		binder.setDisallowedFields("ISJEDI");
+		MutablePropertyValues pvs = new MutablePropertyValues();
+		pvs.add("isJedi", "true");
+		binder.bind(pvs);
+		binder.close();
+		// In vulnerable versions, this will incorrectly be true
+		assertThat(user.isJedi()).as("should not bind disallowed 'isJedi' field").isFalse();
+		// Suppressed fields should include the one that matched (case-insensitive)
+		assertThat(binder.getBindingResult().getSuppressedFields())
+				.containsExactlyInAnyOrder("isJedi");
+	}
+
+	@Test
 	void bindingWithAllowedAndDisallowedFields() throws BindException {
 		TestBean rod = new TestBean();
 		DataBinder binder = new DataBinder(rod);

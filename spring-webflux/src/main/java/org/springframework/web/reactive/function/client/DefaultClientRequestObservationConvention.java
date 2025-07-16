@@ -17,6 +17,7 @@
 package org.springframework.web.reactive.function.client;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import io.micrometer.common.KeyValue;
@@ -89,7 +90,7 @@ public class DefaultClientRequestObservationConvention implements ClientRequestO
 
 	@Override
 	public String getContextualName(ClientRequestObservationContext context) {
-		return "http " + context.getRequest().method().name().toLowerCase();
+		return "http " + context.getRequest().method().name().toLowerCase(Locale.ROOT);
 	}
 
 	@Override

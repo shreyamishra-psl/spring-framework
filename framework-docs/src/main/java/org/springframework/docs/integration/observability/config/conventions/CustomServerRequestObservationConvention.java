@@ -16,6 +16,8 @@
 
 package org.springframework.docs.integration.observability.config.conventions;
 
+import java.util.Locale;
+
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
 
@@ -34,7 +36,7 @@ public class CustomServerRequestObservationConvention implements ServerRequestOb
 	@Override
 	public String getContextualName(ServerRequestObservationContext context) {
 		// will be used for the trace name
-		return "http " + context.getCarrier().getMethod().toLowerCase();
+		return "http " + context.getCarrier().getMethod().toLowerCase(Locale.ROOT);
 	}
 
 	@Override
