@@ -20,15 +20,18 @@ import java.beans.PropertyEditorSupport;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.PropertyValues;
 import org.springframework.beans.testfixture.beans.ITestBean;
 import org.springframework.beans.testfixture.beans.TestBean;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.ServletRequestParameterPropertyValues;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.support.StringMultipartFileEditor;
@@ -361,6 +364,21 @@ public class WebRequestDataBinderTests {
 		assertThat(condition).as("Found array value").isTrue();
 		String[] values = (String[]) pvs.getPropertyValue("forname").getValue();
 		assertThat(Arrays.asList(original)).as("Correct values").isEqualTo(Arrays.asList(values));
+	}
+
+	@Test
+	void bindingWithDisallowedFieldsWithTurkishLocale() throws BindException {
+		TestBean user = new TestBean();
+		WebRequestDataBinder binder = new WebRequestDataBinder(user);
+		Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+		binder.setDisallowedFields("ISJEDI");
+		MutablePropertyValues pvs = new MutablePropertyValues();
+		pvs.add("isJedi", "true");
+		binder.bind(pvs);
+		binder.close();
+		assertThat(user.isJedi()).as("should not bind disallowed 'isJedi' field").isFalse();
+		assertThat(binder.getBindingResult().getSuppressedFields())
+				.containsExactlyInAnyOrder("isJedi");
 	}
 
 
